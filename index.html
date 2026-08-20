@@ -12,10 +12,10 @@
 <style>
   :root{
     --bg:#000000;
-    --cyan:#00e5ff;
-    --violet:#7b5cff;
+    --cyan:#22e0ff;
+    --violet:#8a5cff;
     --text:#e8f6ff;
-    --dim:#5a7a8c;
+    --dim:#527786;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%}
@@ -29,170 +29,269 @@
     position:relative;
   }
 
-  /* animated grid floor */
-  .grid{
-    position:fixed;inset:0;
-    background-image:
-      linear-gradient(rgba(0,229,255,.10) 1px,transparent 1px),
-      linear-gradient(90deg,rgba(0,229,255,.10) 1px,transparent 1px);
-    background-size:60px 60px;
-    transform:perspective(420px) rotateX(72deg) scale(2.6);
-    transform-origin:50% 100%;
-    animation:grid-move 5s linear infinite;
-    mask-image:linear-gradient(to top,#000 0%,transparent 72%);
-    -webkit-mask-image:linear-gradient(to top,#000 0%,transparent 72%);
-    pointer-events:none;
-  }
-  @keyframes grid-move{to{background-position:0 60px,0 0}}
-
-  /* radial glow */
-  .glow{
-    position:fixed;inset:0;pointer-events:none;
+  /* --- interference fringes: two sinusoidal wave families beating against each other --- */
+  .fringes{
+    position:fixed;inset:-20%;pointer-events:none;z-index:1;
     background:
-      radial-gradient(ellipse 60% 40% at 50% 55%, rgba(123,92,255,.18), transparent 70%),
-      radial-gradient(ellipse 80% 50% at 50% 100%, rgba(0,229,255,.16), transparent 70%);
+      repeating-linear-gradient(97deg, rgba(34,224,255,.055) 0 1px, transparent 1px 9px),
+      repeating-linear-gradient(83deg, rgba(138,92,255,.055) 0 1px, transparent 1px 11px);
+    animation:fringe-drift 22s linear infinite;
+    mix-blend-mode:screen;
+  }
+  @keyframes fringe-drift{
+    to{transform:translate3d(9px,0,0)}
   }
 
-  canvas#stars{position:fixed;inset:0;pointer-events:none}
+  /* --- optical-bench glow: Gaussian beam waist behind the wordmark --- */
+  .waist{
+    position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:
+      radial-gradient(ellipse 70% 22% at 50% 50%, rgba(34,224,255,.13), transparent 72%),
+      radial-gradient(ellipse 40% 55% at 50% 50%, rgba(138,92,255,.10), transparent 75%),
+      radial-gradient(ellipse 90% 60% at 50% 118%, rgba(20,80,140,.16), transparent 70%);
+  }
+
+  canvas#optics{position:fixed;inset:0;pointer-events:none;z-index:2}
 
   /* scanlines + vignette */
   .fx{
-    position:fixed;inset:0;pointer-events:none;z-index:5;
+    position:fixed;inset:0;pointer-events:none;z-index:6;
     background:
-      repeating-linear-gradient(to bottom,rgba(255,255,255,.035) 0 1px,transparent 1px 3px),
-      radial-gradient(ellipse at center,transparent 45%,rgba(0,0,0,.75) 100%);
+      repeating-linear-gradient(to bottom,rgba(255,255,255,.03) 0 1px,transparent 1px 3px),
+      radial-gradient(ellipse at center,transparent 42%,rgba(0,0,0,.78) 100%);
   }
 
-  main{position:relative;z-index:3;text-align:center;padding:0 24px}
+  main{position:relative;z-index:4;text-align:center;padding:0 24px}
 
+  /* --- dispersed spectrum rules: white in, rainbow out --- */
   .rule{
-    width:min(520px,80vw);height:1px;margin:0 auto;
-    background:linear-gradient(90deg,transparent,var(--cyan),transparent);
-    opacity:.7;
+    width:min(560px,84vw);height:1px;margin:0 auto;
+    background:linear-gradient(90deg,
+      transparent 0%,
+      rgba(138,92,255,.75) 12%,
+      rgba(60,120,255,.8) 26%,
+      rgba(34,224,255,.95) 40%,
+      rgba(120,255,200,.9) 52%,
+      rgba(230,255,120,.85) 64%,
+      rgba(255,160,80,.8) 78%,
+      rgba(255,90,90,.65) 88%,
+      transparent 100%);
+    box-shadow:0 0 12px rgba(34,224,255,.35);
   }
 
   h1{
     font-family:'Orbitron',sans-serif;
     font-weight:900;
-    font-size:clamp(2.2rem,10.5vw,7rem);
+    font-size:clamp(2.1rem,10.2vw,6.8rem);
     letter-spacing:.14em;
     text-transform:uppercase;
     line-height:1;
-    margin:26px 0;
-    background:linear-gradient(180deg,#ffffff 0%,var(--cyan) 55%,var(--violet) 100%);
+    margin:28px 0;
+    /* prism dispersion across the wordmark */
+    background:linear-gradient(105deg,
+      #b79bff 0%,
+      #6ea8ff 18%,
+      #22e0ff 38%,
+      #7dffd0 56%,
+      #eaff9a 72%,
+      #ffb36b 86%,
+      #ff8080 100%);
     -webkit-background-clip:text;background-clip:text;
     color:transparent;
-    filter:drop-shadow(0 0 18px rgba(0,229,255,.45)) drop-shadow(0 0 46px rgba(123,92,255,.30));
-    animation:flicker 6s infinite;
+    filter:
+      drop-shadow(0 0 16px rgba(34,224,255,.45))
+      drop-shadow(0 0 40px rgba(138,92,255,.32))
+      drop-shadow(0 0 70px rgba(255,140,90,.12));
+    animation:coherence 9s ease-in-out infinite;
   }
-  @keyframes flicker{
-    0%,96%,100%{opacity:1}
-    97%{opacity:.72}
-    98%{opacity:1}
-    99%{opacity:.85}
+  /* slow intensity breathing, like a laser locking to coherence */
+  @keyframes coherence{
+    0%,100%{filter:drop-shadow(0 0 16px rgba(34,224,255,.42)) drop-shadow(0 0 40px rgba(138,92,255,.30))}
+    50%    {filter:drop-shadow(0 0 26px rgba(34,224,255,.62)) drop-shadow(0 0 64px rgba(138,92,255,.42))}
   }
 
   .sub{
     font-family:'Orbitron',sans-serif;
     font-weight:500;
-    font-size:clamp(.75rem,2.6vw,1.35rem);
+    font-size:clamp(.74rem,2.6vw,1.3rem);
     letter-spacing:.55em;
     text-indent:.55em;
     color:var(--cyan);
-    text-shadow:0 0 14px rgba(0,229,255,.55);
-    margin-top:26px;
+    text-shadow:0 0 14px rgba(34,224,255,.6);
+    margin-top:28px;
   }
   .cursor{
     display:inline-block;width:.55ch;height:1em;
     background:var(--cyan);vertical-align:-.12em;margin-left:.1em;
-    box-shadow:0 0 12px var(--cyan);
+    box-shadow:0 0 14px var(--cyan);
     animation:blink 1.05s steps(1) infinite;
   }
   @keyframes blink{50%{opacity:0}}
 
-  .tag{
-    margin-top:44px;font-size:clamp(.62rem,2vw,.78rem);
-    letter-spacing:.3em;color:var(--dim);text-transform:uppercase;
+  .readout{
+    margin-top:46px;
+    display:flex;gap:clamp(14px,4vw,40px);
+    justify-content:center;flex-wrap:wrap;
+    font-size:clamp(.58rem,1.9vw,.72rem);
+    letter-spacing:.26em;color:var(--dim);text-transform:uppercase;
   }
+  .readout span b{font-weight:400;color:#9fd8ea}
   .dot{
     display:inline-block;width:6px;height:6px;border-radius:50%;
     background:var(--cyan);box-shadow:0 0 10px var(--cyan);
     margin-right:.7em;vertical-align:.06em;
     animation:pulse 2s ease-in-out infinite;
   }
-  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.75)}}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.7)}}
 
   footer{
-    position:fixed;bottom:22px;left:0;right:0;z-index:4;
-    text-align:center;font-size:.62rem;letter-spacing:.28em;
-    color:#33505e;text-transform:uppercase;
+    position:fixed;bottom:22px;left:0;right:0;z-index:5;
+    text-align:center;font-size:.6rem;letter-spacing:.28em;
+    color:#2f4a57;text-transform:uppercase;
   }
 
   @media (prefers-reduced-motion:reduce){
-    .grid,h1,.cursor,.dot{animation:none}
+    .fringes,h1,.cursor,.dot{animation:none}
   }
 </style>
 </head>
 <body>
-  <div class="glow"></div>
-  <canvas id="stars"></canvas>
-  <div class="grid"></div>
+  <div class="waist"></div>
+  <div class="fringes"></div>
+  <canvas id="optics"></canvas>
 
   <main>
     <div class="rule"></div>
     <h1>Lightningstudy</h1>
     <div class="rule"></div>
     <p class="sub">Is Coming Soon<span class="cursor"></span></p>
-    <p class="tag"><span class="dot"></span>System initializing</p>
+    <p class="readout">
+      <span><i class="dot"></i>Beam aligning</span>
+      <span>&lambda; <b>1550 nm</b></span>
+      <span>Coherence <b>locked</b></span>
+    </p>
   </main>
 
-  <footer>&copy; Lightningstudy</footer>
+  <footer>&copy; Lightningstudy &middot; Photonics</footer>
   <div class="fx"></div>
 
 <script>
 (function(){
-  var c=document.getElementById('stars'), x=c.getContext('2d');
+  var cv=document.getElementById('optics'), g=cv.getContext('2d');
   var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var dots=[], dpr=Math.min(devicePixelRatio||1,2), w,h;
+  var dpr=Math.min(devicePixelRatio||1,2), w=0, h=0, t=0;
+  var fibers=[], pulses=[], rings=[];
 
-  function resize(){
+  // spectral palette: photon wavelengths mapped to visible-ish colors
+  var SPECTRUM=[[34,224,255],[110,168,255],[138,92,255],[125,255,208],[234,255,154],[255,179,107]];
+
+  function build(){
     w=innerWidth; h=innerHeight;
-    c.width=w*dpr; c.height=h*dpr;
-    c.style.width=w+'px'; c.style.height=h+'px';
-    x.setTransform(dpr,0,0,dpr,0,0);
-    var n=Math.min(140,Math.round(w*h/12000));
-    dots=[];
+    cv.width=w*dpr; cv.height=h*dpr;
+    cv.style.width=w+'px'; cv.style.height=h+'px';
+    g.setTransform(dpr,0,0,dpr,0,0);
+
+    // waveguides: gentle sine-bent channels spanning the viewport
+    var n=Math.max(5,Math.min(11,Math.round(h/95)));
+    fibers=[];
     for(var i=0;i<n;i++){
-      dots.push({
-        x:Math.random()*w, y:Math.random()*h,
-        r:Math.random()*1.5+.4,
-        vy:-(Math.random()*.28+.06),
-        vx:(Math.random()-.5)*.12,
-        a:Math.random()*.55+.2,
-        hue:Math.random()<.75?'0,229,255':'123,92,255'
+      var base=(i+0.5)/n*h;
+      fibers.push({
+        y:base,
+        amp:16+Math.random()*46,           // bend depth
+        freq:(0.7+Math.random()*1.5)/w*6.283,
+        phase:Math.random()*6.283,
+        col:SPECTRUM[i%SPECTRUM.length],
+        alpha:0.05+Math.random()*0.07
       });
     }
+
+    pulses=[];
+    var count=Math.min(26,Math.round(w/62));
+    for(var k=0;k<count;k++) pulses.push(newPulse(true));
   }
 
-  function frame(){
-    x.clearRect(0,0,w,h);
-    for(var i=0;i<dots.length;i++){
-      var d=dots[i];
-      if(!reduce){ d.y+=d.vy; d.x+=d.vx;
-        if(d.y<-5){d.y=h+5; d.x=Math.random()*w;}
-        if(d.x<-5)d.x=w+5; if(d.x>w+5)d.x=-5;
+  function newPulse(seed){
+    var f=fibers[(Math.random()*fibers.length)|0];
+    var dir=Math.random()<0.5?1:-1;
+    return {
+      f:f,
+      x:seed?Math.random()*w:(dir>0?-60:w+60),
+      dir:dir,
+      v:(0.9+Math.random()*2.4),
+      len:40+Math.random()*130,           // pulse envelope width
+      col:f.col,
+      a:0.45+Math.random()*0.55
+    };
+  }
+
+  function fiberY(f,x){ return f.y + Math.sin(x*f.freq+f.phase)*f.amp; }
+
+  function draw(){
+    g.clearRect(0,0,w,h);
+    g.globalCompositeOperation='lighter';
+
+    // --- waveguides ---
+    for(var i=0;i<fibers.length;i++){
+      var f=fibers[i];
+      g.beginPath();
+      for(var x=0;x<=w;x+=14){
+        var y=fiberY(f,x);
+        x===0?g.moveTo(x,y):g.lineTo(x,y);
       }
-      x.beginPath();
-      x.arc(d.x,d.y,d.r,0,6.283);
-      x.fillStyle='rgba('+d.hue+','+d.a+')';
-      x.shadowBlur=8; x.shadowColor='rgba('+d.hue+',.8)';
-      x.fill();
+      g.strokeStyle='rgba('+f.col+','+f.alpha+')';
+      g.lineWidth=1;
+      g.shadowBlur=0;
+      g.stroke();
     }
-    requestAnimationFrame(frame);
+
+    // --- photon pulses travelling down the guides ---
+    for(var p=0;p<pulses.length;p++){
+      var q=pulses[p];
+      if(!reduce) q.x+=q.v*q.dir;
+      if(q.x<-200||q.x>w+200){ pulses[p]=newPulse(false); continue; }
+
+      // trailing envelope: sampled points fading behind the head
+      var steps=9;
+      for(var s=steps;s>=0;s--){
+        var sx=q.x-q.dir*(q.len/steps)*s;
+        if(sx<-20||sx>w+20) continue;
+        var sy=fiberY(q.f,sx);
+        var fade=(1-s/steps);
+        var r=(1.6+fade*2.2);
+        g.beginPath();
+        g.arc(sx,sy,r,0,6.283);
+        g.fillStyle='rgba('+q.col+','+(q.a*fade*fade*0.9)+')';
+        g.shadowBlur=14*fade;
+        g.shadowColor='rgba('+q.col+',0.9)';
+        g.fill();
+      }
+    }
+    g.shadowBlur=0;
+
+    // --- wavefronts: expanding rings, emitted at intervals from the beam waist ---
+    if(!reduce){
+      t++;
+      if(t%150===0) rings.push({x:w/2,y:h/2,r:0,col:SPECTRUM[(t/150|0)%SPECTRUM.length]});
+      for(var j=rings.length-1;j>=0;j--){
+        var ring=rings[j];
+        ring.r+=1.15;
+        var life=1-ring.r/(Math.max(w,h)*0.72);
+        if(life<=0){ rings.splice(j,1); continue; }
+        g.beginPath();
+        g.ellipse(ring.x,ring.y,ring.r,ring.r*0.42,0,0,6.283);
+        g.strokeStyle='rgba('+ring.col+','+(life*0.16)+')';
+        g.lineWidth=1;
+        g.stroke();
+      }
+    }
+
+    g.globalCompositeOperation='source-over';
+    requestAnimationFrame(draw);
   }
 
-  addEventListener('resize',resize);
-  resize(); frame();
+  addEventListener('resize',build);
+  build(); draw();
 })();
 </script>
 </body>
