@@ -10,12 +10,30 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
 <style>
+  /* ---------------------------------------------------------------
+     Single-hue palette. Five stops, dark -> light, one family only.
+     To switch the whole site to yellow, replace the five --c* values
+     and --rgb* triples with the YELLOW set noted below.
+     YELLOW: #4a2f00 #8a5c00 #d99a08 #ffc44d #fff0c2
+             74,47,0 / 138,92,0 / 217,154,8 / 255,196,77 / 255,240,194
+     --------------------------------------------------------------- */
   :root{
     --bg:#000000;
-    --cyan:#22e0ff;
-    --violet:#8a5cff;
-    --text:#e8f6ff;
-    --dim:#527786;
+
+    --c1:#062247;   /* deepest  */
+    --c2:#0d4a9e;
+    --c3:#1e86e8;   /* core     */
+    --c4:#6fc3ff;
+    --c5:#d6efff;   /* lightest */
+
+    --rgb1:6,34,71;
+    --rgb2:13,74,158;
+    --rgb3:30,134,232;
+    --rgb4:111,195,255;
+    --rgb5:214,239,255;
+
+    --text:#dfefff;
+    --dim:#4b7186;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%}
@@ -29,31 +47,28 @@
     position:relative;
   }
 
-  /* --- interference fringes: two sinusoidal wave families beating against each other --- */
+  /* --- interference fringes: two wave families beating into moire --- */
   .fringes{
     position:fixed;inset:-20%;pointer-events:none;z-index:1;
     background:
-      repeating-linear-gradient(97deg, rgba(34,224,255,.055) 0 1px, transparent 1px 9px),
-      repeating-linear-gradient(83deg, rgba(138,92,255,.055) 0 1px, transparent 1px 11px);
+      repeating-linear-gradient(97deg, rgba(var(--rgb3),.055) 0 1px, transparent 1px 9px),
+      repeating-linear-gradient(83deg, rgba(var(--rgb2),.075) 0 1px, transparent 1px 11px);
     animation:fringe-drift 22s linear infinite;
     mix-blend-mode:screen;
   }
-  @keyframes fringe-drift{
-    to{transform:translate3d(9px,0,0)}
-  }
+  @keyframes fringe-drift{ to{transform:translate3d(9px,0,0)} }
 
-  /* --- optical-bench glow: Gaussian beam waist behind the wordmark --- */
+  /* --- Gaussian beam waist behind the wordmark --- */
   .waist{
     position:fixed;inset:0;pointer-events:none;z-index:0;
     background:
-      radial-gradient(ellipse 70% 22% at 50% 50%, rgba(34,224,255,.13), transparent 72%),
-      radial-gradient(ellipse 40% 55% at 50% 50%, rgba(138,92,255,.10), transparent 75%),
-      radial-gradient(ellipse 90% 60% at 50% 118%, rgba(20,80,140,.16), transparent 70%);
+      radial-gradient(ellipse 70% 22% at 50% 50%, rgba(var(--rgb3),.15), transparent 72%),
+      radial-gradient(ellipse 40% 55% at 50% 50%, rgba(var(--rgb2),.14), transparent 75%),
+      radial-gradient(ellipse 90% 60% at 50% 118%, rgba(var(--rgb1),.55), transparent 70%);
   }
 
   canvas#optics{position:fixed;inset:0;pointer-events:none;z-index:2}
 
-  /* scanlines + vignette */
   .fx{
     position:fixed;inset:0;pointer-events:none;z-index:6;
     background:
@@ -63,20 +78,18 @@
 
   main{position:relative;z-index:4;text-align:center;padding:0 24px}
 
-  /* --- dispersed spectrum rules: white in, rainbow out --- */
+  /* --- intensity rules: dark edges, bright core --- */
   .rule{
     width:min(560px,84vw);height:1px;margin:0 auto;
     background:linear-gradient(90deg,
       transparent 0%,
-      rgba(138,92,255,.75) 12%,
-      rgba(60,120,255,.8) 26%,
-      rgba(34,224,255,.95) 40%,
-      rgba(120,255,200,.9) 52%,
-      rgba(230,255,120,.85) 64%,
-      rgba(255,160,80,.8) 78%,
-      rgba(255,90,90,.65) 88%,
+      rgba(var(--rgb2),.55) 18%,
+      rgba(var(--rgb3),.9) 38%,
+      var(--c5) 50%,
+      rgba(var(--rgb3),.9) 62%,
+      rgba(var(--rgb2),.55) 82%,
       transparent 100%);
-    box-shadow:0 0 12px rgba(34,224,255,.35);
+    box-shadow:0 0 12px rgba(var(--rgb3),.45);
   }
 
   h1{
@@ -87,27 +100,20 @@
     text-transform:uppercase;
     line-height:1;
     margin:28px 0;
-    /* prism dispersion across the wordmark */
-    background:linear-gradient(105deg,
-      #b79bff 0%,
-      #6ea8ff 18%,
-      #22e0ff 38%,
-      #7dffd0 56%,
-      #eaff9a 72%,
-      #ffb36b 86%,
-      #ff8080 100%);
+    background:linear-gradient(160deg,
+      var(--c5) 0%,
+      var(--c4) 26%,
+      var(--c3) 55%,
+      var(--c2) 82%,
+      var(--c1) 100%);
     -webkit-background-clip:text;background-clip:text;
     color:transparent;
-    filter:
-      drop-shadow(0 0 16px rgba(34,224,255,.45))
-      drop-shadow(0 0 40px rgba(138,92,255,.32))
-      drop-shadow(0 0 70px rgba(255,140,90,.12));
     animation:coherence 9s ease-in-out infinite;
   }
   /* slow intensity breathing, like a laser locking to coherence */
   @keyframes coherence{
-    0%,100%{filter:drop-shadow(0 0 16px rgba(34,224,255,.42)) drop-shadow(0 0 40px rgba(138,92,255,.30))}
-    50%    {filter:drop-shadow(0 0 26px rgba(34,224,255,.62)) drop-shadow(0 0 64px rgba(138,92,255,.42))}
+    0%,100%{filter:drop-shadow(0 0 16px rgba(var(--rgb3),.45)) drop-shadow(0 0 42px rgba(var(--rgb2),.35))}
+    50%    {filter:drop-shadow(0 0 26px rgba(var(--rgb3),.65)) drop-shadow(0 0 66px rgba(var(--rgb2),.48))}
   }
 
   .sub{
@@ -116,14 +122,14 @@
     font-size:clamp(.74rem,2.6vw,1.3rem);
     letter-spacing:.55em;
     text-indent:.55em;
-    color:var(--cyan);
-    text-shadow:0 0 14px rgba(34,224,255,.6);
+    color:var(--c4);
+    text-shadow:0 0 14px rgba(var(--rgb3),.65);
     margin-top:28px;
   }
   .cursor{
     display:inline-block;width:.55ch;height:1em;
-    background:var(--cyan);vertical-align:-.12em;margin-left:.1em;
-    box-shadow:0 0 14px var(--cyan);
+    background:var(--c4);vertical-align:-.12em;margin-left:.1em;
+    box-shadow:0 0 14px rgba(var(--rgb4),.9);
     animation:blink 1.05s steps(1) infinite;
   }
   @keyframes blink{50%{opacity:0}}
@@ -135,10 +141,10 @@
     font-size:clamp(.58rem,1.9vw,.72rem);
     letter-spacing:.26em;color:var(--dim);text-transform:uppercase;
   }
-  .readout span b{font-weight:400;color:#9fd8ea}
+  .readout span b{font-weight:400;color:var(--c4)}
   .dot{
     display:inline-block;width:6px;height:6px;border-radius:50%;
-    background:var(--cyan);box-shadow:0 0 10px var(--cyan);
+    background:var(--c4);box-shadow:0 0 10px rgba(var(--rgb4),.9);
     margin-right:.7em;vertical-align:.06em;
     animation:pulse 2s ease-in-out infinite;
   }
@@ -147,7 +153,7 @@
   footer{
     position:fixed;bottom:22px;left:0;right:0;z-index:5;
     text-align:center;font-size:.6rem;letter-spacing:.28em;
-    color:#2f4a57;text-transform:uppercase;
+    color:#2c4756;text-transform:uppercase;
   }
 
   @media (prefers-reduced-motion:reduce){
@@ -182,8 +188,11 @@
   var dpr=Math.min(devicePixelRatio||1,2), w=0, h=0, t=0;
   var fibers=[], pulses=[], rings=[];
 
-  // spectral palette: photon wavelengths mapped to visible-ish colors
-  var SPECTRUM=[[34,224,255],[110,168,255],[138,92,255],[125,255,208],[234,255,154],[255,179,107]];
+  // single-hue ramp, read straight from the CSS tokens so palette lives in one place
+  var css=getComputedStyle(document.documentElement);
+  var RAMP=['--rgb2','--rgb3','--rgb4','--rgb5'].map(function(k){
+    return css.getPropertyValue(k).trim();
+  });
 
   function build(){
     w=innerWidth; h=innerHeight;
@@ -195,13 +204,12 @@
     var n=Math.max(5,Math.min(11,Math.round(h/95)));
     fibers=[];
     for(var i=0;i<n;i++){
-      var base=(i+0.5)/n*h;
       fibers.push({
-        y:base,
-        amp:16+Math.random()*46,           // bend depth
+        y:(i+0.5)/n*h,
+        amp:16+Math.random()*46,
         freq:(0.7+Math.random()*1.5)/w*6.283,
         phase:Math.random()*6.283,
-        col:SPECTRUM[i%SPECTRUM.length],
+        col:RAMP[i%RAMP.length],
         alpha:0.05+Math.random()*0.07
       });
     }
@@ -219,8 +227,8 @@
       x:seed?Math.random()*w:(dir>0?-60:w+60),
       dir:dir,
       v:(0.9+Math.random()*2.4),
-      len:40+Math.random()*130,           // pulse envelope width
-      col:f.col,
+      len:40+Math.random()*130,
+      col:RAMP[(Math.random()*RAMP.length)|0],
       a:0.45+Math.random()*0.55
     };
   }
@@ -240,8 +248,7 @@
         x===0?g.moveTo(x,y):g.lineTo(x,y);
       }
       g.strokeStyle='rgba('+f.col+','+f.alpha+')';
-      g.lineWidth=1;
-      g.shadowBlur=0;
+      g.lineWidth=1; g.shadowBlur=0;
       g.stroke();
     }
 
@@ -251,16 +258,14 @@
       if(!reduce) q.x+=q.v*q.dir;
       if(q.x<-200||q.x>w+200){ pulses[p]=newPulse(false); continue; }
 
-      // trailing envelope: sampled points fading behind the head
       var steps=9;
       for(var s=steps;s>=0;s--){
         var sx=q.x-q.dir*(q.len/steps)*s;
         if(sx<-20||sx>w+20) continue;
         var sy=fiberY(q.f,sx);
         var fade=(1-s/steps);
-        var r=(1.6+fade*2.2);
         g.beginPath();
-        g.arc(sx,sy,r,0,6.283);
+        g.arc(sx,sy,1.6+fade*2.2,0,6.283);
         g.fillStyle='rgba('+q.col+','+(q.a*fade*fade*0.9)+')';
         g.shadowBlur=14*fade;
         g.shadowColor='rgba('+q.col+',0.9)';
@@ -269,10 +274,10 @@
     }
     g.shadowBlur=0;
 
-    // --- wavefronts: expanding rings, emitted at intervals from the beam waist ---
+    // --- wavefronts expanding from the beam waist ---
     if(!reduce){
       t++;
-      if(t%150===0) rings.push({x:w/2,y:h/2,r:0,col:SPECTRUM[(t/150|0)%SPECTRUM.length]});
+      if(t%150===0) rings.push({x:w/2,y:h/2,r:0,col:RAMP[(t/150|0)%RAMP.length]});
       for(var j=rings.length-1;j>=0;j--){
         var ring=rings[j];
         ring.r+=1.15;
